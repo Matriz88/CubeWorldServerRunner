@@ -4,48 +4,119 @@ using System.IO;
 
 namespace CubeWorldServerRunner
 {
-    class Program
+    public class Program
     {
-        private static string _serverCfg = "server.cfg";
+        // labels
+        private const string PressKeyToExit = "Press key to exit...";
 
-        static void Main(string[] args)
+        // files paths
+        private const string ServerCfg = "server.cfg";
+        private const string ServerExe = "Server.exe";
+
+        public static void Main(string[] args)
         {
-            if (!File.Exists(_serverCfg)) return;
+            if (CheckConfigFileExists()) return;
 
-            string confSeed;
+            var confSeed = ReadConfigFile();
 
-            using (FileStream readFileStream = new FileStream(_serverCfg, FileMode.Open))
-            {
-                using StreamReader reader = new StreamReader(readFileStream);
-                confSeed = reader.ReadLine();
-            }
+            confSeed = GetSeedFromUser(confSeed);
 
-            Console.Write($"Insert seed {(!string.IsNullOrEmpty(confSeed) ? $"({confSeed})" : "")}: ");
+            WriteConfigFile(confSeed);
 
-            var userSeed = Console.ReadLine();
+            if (CheckServerFileExists()) return;
 
-            if (!string.IsNullOrEmpty(userSeed) && int.TryParse(userSeed, out _))
-            {
-                confSeed = userSeed;
-            }
-
-            using (StreamWriter writer = File.CreateText(_serverCfg))
-            {
-                writer.WriteLine(confSeed);
-                Console.WriteLine($"New seed {userSeed} saved!");
-            }
-
-            var process = Process.Start("Server.exe");
+            var process = Process.Start(ServerExe);
             if (process == null) // failed to start
             {
                 Console.WriteLine("Failed to run server.");
-                Console.WriteLine("Press key to exit...");
-                Console.ReadLine();
+                UserPressKey();
             }
             else // Started, wait for it to finish
             {
                 process.WaitForExit();
             }
+
+            UserPressKey();
         }
+
+        #region files operations
+
+        private static bool CheckConfigFileExists()
+        {
+            if (File.Exists(ServerCfg)) return false;
+
+            Console.WriteLine("Can't find the configuration file.");
+            Console.WriteLine("Be sure this executable is placed in Cube World installation folder.");
+            UserPressKey();
+            return true;
+        }
+
+        private static bool CheckServerFileExists()
+        {
+            if (File.Exists(ServerExe)) return false;
+
+            Console.WriteLine("Can't find the server executable file.");
+            Console.WriteLine("Be sure this executable is placed in Cube World installation folder.");
+            UserPressKey();
+            return true;
+        }
+
+        private static void WriteConfigFile(string confSeed)
+        {
+            using StreamWriter writer = File.CreateText(ServerCfg);
+            writer.WriteLine(confSeed);
+            Console.WriteLine($"Seed {confSeed} saved!");
+        }
+
+        private static string ReadConfigFile()
+        {
+            string confSeed;
+            using (FileStream readFileStream = new FileStream(ServerCfg, FileMode.Open))
+            {
+                using StreamReader reader = new StreamReader(readFileStream);
+                confSeed = reader.ReadLine();
+            }
+
+            if (IsInt(confSeed)) return confSeed;
+
+            Console.WriteLine("The seed in your configuration file is not valid. Please specify a new valid one.");
+            confSeed = string.Empty;
+
+            return confSeed;
+        }
+
+        #endregion
+
+        #region inputs
+
+        private static string GetSeedFromUser(string confSeed)
+        {
+            string userSeed;
+
+            do
+            {
+                Console.Write($"Insert seed{(!string.IsNullOrEmpty(confSeed) ? $" ({confSeed})" : "")}: ");
+                userSeed = Console.ReadLine();
+            } while (string.IsNullOrEmpty(confSeed) && !IsInt(userSeed));
+
+            return IsInt(userSeed) ? userSeed : confSeed;
+        }
+
+        private static void UserPressKey()
+        {
+            Console.WriteLine(PressKeyToExit);
+            Console.ReadLine();
+        }
+
+        #endregion
+
+        #region other privates
+
+        private static bool IsInt(string stringInt)
+        {
+            return int.TryParse(stringInt, out _);
+        }
+
+        #endregion
     }
 }
