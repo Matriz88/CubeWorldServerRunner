@@ -6,11 +6,18 @@ Runner for Cube World Server.
 
 Allows you to set a seed when you run the server. No need to edit your server.cfg manually 😉.
 
-## 🔧 How it works:
+## 🛠️ How to build it:
 
-Download zip file [here](https://github.com/Matriz88/CubeWorldServerRunner/releases/latest)
+Visual Studio 2022 or similar ide is mandatory to build the executable.
 
-Extract `CubeWorldServerRunner.exe` in your Cube World installation folder. (Default: `C:\Program Files (x86)\Cube World`).
+1. Open the project solution with Visual Studio 2022.
+2. Right click on the project in the solution explorer sidebar and click **publish**.
+3. Now you have the executable file ready to use in `/publish` folder.
+4. Copy the file `CubeWorldServerRunner.exe` and follow the next steps.
+
+## 🚀 How it works:
+
+Copy `CubeWorldServerRunner.exe` in your Cube World installation folder. (Default: `C:\Program Files (x86)\Cube World`).
 
 Run `CubeWorldServerRunner.exe`.
 
