@@ -63,19 +63,16 @@ namespace CubeWorldServerRunner
 
         private static void WriteConfigFile(string confSeed)
         {
-            using StreamWriter writer = File.CreateText(ServerCfg);
+            using var writer = File.CreateText(ServerCfg);
             writer.WriteLine(confSeed);
             Console.WriteLine($"Seed {confSeed} saved!");
         }
 
         private static string ReadConfigFile()
         {
-            string confSeed;
-            using (FileStream readFileStream = new FileStream(ServerCfg, FileMode.Open))
-            {
-                using StreamReader reader = new StreamReader(readFileStream);
-                confSeed = reader.ReadLine();
-            }
+            using var readFileStream = new FileStream(ServerCfg, FileMode.Open);
+            using var reader = new StreamReader(readFileStream);
+            var confSeed = reader.ReadLine();
 
             if (IsInt(confSeed)) return confSeed;
 
